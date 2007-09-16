@@ -110,7 +110,7 @@ module ResourceThis # :nodoc:
               format.xml  { head :ok }
             else
               format.html { render :action => :edit }
-              format.xml  { render :xml => @#{singular_name.errors, :status => :unprocessable_entity }
+              format.xml  { render :xml => @#{singular_name}.errors, :status => :unprocessable_entity }
             end
           end
         end
