@@ -14,12 +14,12 @@ module ResourceThis # :nodoc:
       will_paginate_index   = options[:class_name] || false
       
       module_eval <<-"end_eval", __FILE__, __LINE__
-      before_filter :load_#{singular_name}, :only => [ :show, :edit, :update, :destroy ]
-      before_filter :load_#{plural_name}, :only => [ :index ]
-      before_filter :new_#{singular_name}, :only => [ :new ]
-      before_filter :create_#{singular_name}, :only => [ :create ]
-      before_filter :update_#{singular_name}, :only => [ :update ]
-      before_filter :destroy_#{singular_name}, :only => [ :destroy ]
+        before_filter :load_#{singular_name}, :only => [ :show, :edit, :update, :destroy ]
+        before_filter :load_#{plural_name}, :only => [ :index ]
+        before_filter :new_#{singular_name}, :only => [ :new ]
+        before_filter :create_#{singular_name}, :only => [ :create ]
+        before_filter :update_#{singular_name}, :only => [ :update ]
+        before_filter :destroy_#{singular_name}, :only => [ :destroy ]
       
       protected
         def load_#{singular_name}

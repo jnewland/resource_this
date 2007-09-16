@@ -1,6 +1,105 @@
 resouce_this
 ===========
 
-docs here
+Not scaffolding. Resourcing. Creates extremely customizable resource controllers with one line of code.
+
+  class PostsController < ActionController::Base
+   resource_this
+  end
+
+...will generate the following code:
+
+  class PostsController < ActionController::Base
+    before_filter :load_post, :only => [ :show, :edit, :update, :destroy ]
+    before_filter :load_posts, :only => [ :index ]
+    before_filter :new_post, :only => [ :new ]
+    before_filter :create_post, :only => [ :create ]
+    before_filter :update_post, :only => [ :update ]
+    before_filter :destroy_post, :only => [ :destroy ]
+
+  protected
+    def load_post
+      @post = Post.find(params[:id])
+    end
+  
+    def new_post
+      @post = Post.new
+    end
+  
+    def create_post
+      @post = Post.new(params[:post])
+      @created = @post.save
+    end
+  
+    def update_post
+      @updated = @post.update_attributes(params[:post])
+    end
+  
+    def destroy_post
+      @post = @post.destroy
+    end
+  
+    def load_posts
+      @posts = Post.find(:all)
+    end
+  
+  public
+    def index
+      respond_to do |format|
+        format.html
+        format.xml  { render :xml => @posts }
+      end
+    end
+
+    def show          
+      respond_to do |format|
+        format.html
+        format.xml  { render :xml => @post }
+      end
+    end
+
+    def new          
+      respond_to do |format|
+        format.html { render :action => :edit }
+        format.xml  { render :xml => @post }
+      end
+    end
+
+    def create
+      respond_to do |format|
+        if @created
+          flash[:notice] = 'Post was successfully created.'
+          format.html { redirect_to @post }
+          format.xml  { render :xml => @post, :status => :created, :location => @post }
+        else
+          format.html { render :action => :new }
+          format.xml  { render :xml => @post.errors, :status => :unprocessable_entity }
+        end
+      end
+    end 
+
+    def edit
+    end
+
+    def update
+      respond_to do |format|
+        if @updated
+          flash[:notice] = 'Post was successfully updated.'
+          format.html { redirect_to @post }
+          format.xml  { head :ok }
+        else
+          format.html { render :action => :edit }
+          format.xml  { render :xml => @post.errors, :status => :unprocessable_entity }
+        end
+      end
+    end
+
+    def destroy          
+      respond_to do |format|
+        format.html { redirect_to :action => posts_url }
+        format.xml  { head :ok }
+      end
+    end
+  end
 
 Copyright (c) 2007 Jesse Newland, released under the MIT license
