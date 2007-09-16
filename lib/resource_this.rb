@@ -12,21 +12,32 @@ module ResourceThis # :nodoc:
       class_name            = options[:class_name] || singular_name.camelize
       plural_name           = singular_name.pluralize
       will_paginate_index   = options[:will_paginate] || false
-
-      module_eval <<-"end_eval", __FILE__, __LINE__
-
-        def index
-          if will_paginate_index
+      
+      if will_paginate_index
+        module_eval <<-"end_eval", __FILE__, __LINE__
+          def index
             @#{plural_name} = #{class_name}.paginate(:page => params[:page])
-          else
-            @#{plural_name} = #{class_name}.find(:all)
+            #TODO: add sorting customizable by subclassed controllers
+            respond_to do |format|
+              format.html
+              format.xml  { render :xml => @#{plural_name} }
+            end
           end
-          #TODO: add sorting customizable by subclassed controllers
-          respond_to do |format|
-            format.html
-            format.xml  { render :xml => @#{plural_name} }
+        end_eval
+      else
+        module_eval <<-"end_eval", __FILE__, __LINE__
+          def index
+            @#{plural_name} = #{class_name}.find(:all)
+            #TODO: add sorting customizable by subclassed controllers
+            respond_to do |format|
+              format.html
+              format.xml  { render :xml => @#{plural_name} }
+            end
           end
         end
+      end
+
+      module_eval <<-"end_eval", __FILE__, __LINE__
 
         def show
           @#{singular_name} = #{class_name}.find(params[:id])

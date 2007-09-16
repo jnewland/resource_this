@@ -31,7 +31,6 @@ class ResourceThisTest < Test::Unit::TestCase
 
   def test_should_get_index
     get :index
-    puts @response.inspect
     assert_response :success
     assert assigns(:posts)
   end
