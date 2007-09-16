@@ -24,27 +24,25 @@ class ResourceThisTest < Test::Unit::TestCase
   def setup
     @controller = PostsController.new
     @request    = ActionController::TestRequest.new
+    @request.accept = 'application/xml'  
     @response   = ActionController::TestResponse.new
-
     @first = Post.create :title => "Welcome to the weblog", :body => "Such a lovely day"
   end
 
   def test_should_get_index
-    accept :xml
     get :index
+    puts @response.inspect
     assert_response :success
     assert assigns(:posts)
   end
 
   def test_should_get_new
-    accept :xml
     get :new
     assert_response :success
     assert assigns(:post)
   end
 
   def test_should_create_post
-    accept :xml
     assert_difference('Post.count') do
       post :create, :post => { :title => "test", :body => "test" }
     end
@@ -53,28 +51,24 @@ class ResourceThisTest < Test::Unit::TestCase
   end
 
   def test_should_show_post
-    accept :xml
     get :show, :id => 1
     assert_response :success
     assert assigns(:post)
   end
 
   def test_should_get_edit
-    accept :xml
     get :edit, :id => 1
     assert_response :success
     assert assigns(:post)  
   end
 
   def test_should_update_post
-    accept :xml
     put :update, :id => 1, :post => { :title => "test", :body => "test" }
     assert_response :success
     assert assigns(:post)
   end
 
   def test_should_destroy_post
-    accept :xml
     assert_difference('Post.count', -1) do
       delete :destroy, :id => 1
     end
