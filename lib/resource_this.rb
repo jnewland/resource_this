@@ -11,7 +11,7 @@ module ResourceThis # :nodoc:
       singular_name         = options[:class_name].downcase.singularize unless options[:class_name].nil?
       class_name            = options[:class_name] || singular_name.camelize
       plural_name           = singular_name.pluralize
-      will_paginate_index   = options[:will_paginate] || false
+      will_paginate_index   = options[:class_name] || false
       
       module_eval <<-"end_eval", __FILE__, __LINE__
       before_filter :load_#{singular_name}, :only => [ :show, :edit, :update, :destroy ]
@@ -64,8 +64,6 @@ module ResourceThis # :nodoc:
       module_eval <<-"end_eval", __FILE__, __LINE__
       public
         def index
-          @#{plural_name} = #{class_name}.paginate(:page => params[:page])
-          #TODO: add sorting customizable by subclassed controllers
           respond_to do |format|
             format.html
             format.xml  { render :xml => @#{plural_name} }

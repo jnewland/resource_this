@@ -6,16 +6,16 @@ ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :dbfile => ":memo
 
 ActiveRecord::Schema.define(:version => 1) do
   create_table :posts do |t|
-    t.column :title,      :string
-    t.column :body,       :text
-    t.column :slug,       :text
-    t.column :user_id,     :integer
-    t.column :created_at, :datetime
-    t.column :updated_at, :datetime
+    t.column :title,        :string
+    t.column :body,         :text
+    t.column :created_at,   :datetime
+    t.column :updated_at,   :datetime
   end
 end
 
 class Post < ActiveRecord::Base
+  def validate
+  end
 end
 
 class PostsController < ActionController::Base
@@ -28,7 +28,12 @@ class ResourceThisTest < Test::Unit::TestCase
     @request    = ActionController::TestRequest.new
     @request.accept = 'application/xml'  
     @response   = ActionController::TestResponse.new
-    @first = Post.create(:title => "test", :body => "test", :slug => "test", :user_id => 1)
+    @first = Post.create(:title => "test", :body => "test")
+    with_routing do |set|
+      set.draw do |map| 
+        map.resources :posts
+      end
+    end
   end
 
   def test_should_get_index
@@ -45,20 +50,20 @@ class ResourceThisTest < Test::Unit::TestCase
 
   def test_should_create_post
     assert_difference('Post.count') do
-      post :create, :post => { :title => "test", :body => "test", :slug => "test", :user_id => 1 }
+      post :create, :post => { :title => "test", :body => "test" }
     end
     assert_response :created
     assert assigns(:post)
   end
 
   def test_should_show_post
-    get :show, :id => 1
+    get :show, :id => @first.id
     assert_response :success
     assert assigns(:post)
   end
 
   def test_should_update_post
-    put :update, :id => 1, :post => { :title => "test", :body => "test", :slug => "test!", :user_id => 1 }
+    put :update, :id => @first.id, :post => { :title => "test", :body => "test" }
     assert_response :success
     assert assigns(:post)
   end
