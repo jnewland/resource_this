@@ -45,7 +45,7 @@ class ResourceThisTest < Test::Unit::TestCase
     assert_difference('Post.count') do
       post :create, :post => { :title => "test", :body => "test" }
     end
-    assert_response :success
+    assert_response :created
     assert assigns(:post)
   end
 
@@ -53,12 +53,6 @@ class ResourceThisTest < Test::Unit::TestCase
     get :show, :id => 1
     assert_response :success
     assert assigns(:post)
-  end
-
-  def test_should_get_edit
-    get :edit, :id => 1
-    assert_response :success
-    assert assigns(:post)  
   end
 
   def test_should_update_post
