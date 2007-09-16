@@ -7,7 +7,8 @@ module ResourceThis # :nodoc:
     def resource_this(options = {})
       options.assert_valid_keys(:class_name, :will_paginate, :sort_method)
 
-      singular_name         = options[:class_name].downcase.singularize || controller_name.singularize
+      singular_name         = controller_name.singularize
+      singular_name         = options[:class_name].downcase.singularize unless options[:class_name].nil?
       class_name            = options[:class_name] || singular_name.camelize
       plural_name           = singular_name.pluralize
       will_paginate_index   = options[:class_name] || false
