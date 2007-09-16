@@ -28,7 +28,7 @@ class ResourceThisTest < Test::Unit::TestCase
     @request    = ActionController::TestRequest.new
     @request.accept = 'application/xml'  
     @response   = ActionController::TestResponse.new
-    @first = Post.create :title => "Welcome to the weblog", :body => "Such a lovely day", :slug => "welcome", :user_id => 1
+    @first = Post.create(:title => "test", :body => "test", :slug => "test", :user_id => 1)
   end
 
   def test_should_get_index
@@ -58,7 +58,7 @@ class ResourceThisTest < Test::Unit::TestCase
   end
 
   def test_should_update_post
-    put :update, :id => 1, :post => { :title => "test", :body => "test", :slug => "test", :user_id => 1 }
+    put :update, :id => 1, :post => { :title => "test", :body => "test", :slug => "test!", :user_id => 1 }
     assert_response :success
     assert assigns(:post)
   end
