@@ -36,7 +36,7 @@ module ResourceThis # :nodoc:
         end
         
         def update_#{singular_name}
-          @#{singular_name} = #{class_name}.update_attributes(params[:#{singular_name}])
+          @#{singular_name} = #{singular_name}.update_attributes(params[:#{singular_name}])
         end
         
         def destroy_#{singular_name}
