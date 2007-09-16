@@ -1,0 +1,2 @@
+* Document will_paginate support.
+* Add logical sorting support to the :index action.

@@ -1,26 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../../../../config/environment.rb'))
-require 'action_controller/test_process'
-require 'active_record/fixtures'
-
-ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :dbfile => ":memory:")
-
-ActiveRecord::Schema.define(:version => 1) do
-  create_table :posts do |t|
-    t.column :title,        :string
-    t.column :body,         :text
-    t.column :created_at,   :datetime
-    t.column :updated_at,   :datetime
-  end
-end
-
-class Post < ActiveRecord::Base
-  def validate
-  end
-end
-
-class PostsController < ActionController::Base
-  resource_this
-end
+require File.join(File.dirname(__FILE__), 'test_helper')
 
 class ResourceThisTest < Test::Unit::TestCase
   def setup
@@ -34,6 +12,10 @@ class ResourceThisTest < Test::Unit::TestCase
         map.resources :posts
       end
     end
+  end
+  
+  def teardown
+    Post.find(:all).each { |post| post.destroy }
   end
 
   def test_should_get_index
@@ -55,6 +37,14 @@ class ResourceThisTest < Test::Unit::TestCase
     assert_response :created
     assert assigns(:post)
   end
+  
+  def test_should_create_post_html
+    @request.accept = 'text/html'
+    assert_difference('Post.count') do
+      post :create, :post => { :title => "test", :body => "test" }
+    end
+    assert_redirected_to "/posts/#{assigns(:post).id}"
+  end
 
   def test_should_show_post
     get :show, :id => @first.id
@@ -67,11 +57,25 @@ class ResourceThisTest < Test::Unit::TestCase
     assert_response :success
     assert assigns(:post)
   end
+  
+  def test_should_update_post_html
+    @request.accept = 'text/html'
+    put :update, :id => @first.id, :post => { :title => "test", :body => "test" }
+    assert_redirected_to "/posts/#{assigns(:post).id}"
+  end
 
   def test_should_destroy_post
     assert_difference('Post.count', -1) do
-      delete :destroy, :id => 1
+      delete :destroy, :id => @first.id
     end
     assert_response :success
+  end
+  
+  def test_should_destroy_post_html
+    @request.accept = 'text/html'
+    assert_difference('Post.count', -1) do
+      delete :destroy, :id => @first.id
+    end
+    assert_redirected_to "/posts"
   end
 end

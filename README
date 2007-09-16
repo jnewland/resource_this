@@ -3,8 +3,6 @@ resouce_this
 
 Not scaffolding. Resourcing. Creates extremely customizable resource controllers with one line of code.
 
-NOTE: no nested resource support. yet. this is in testing
-
   class PostsController < ActionController::Base
    resource_this
   end
@@ -50,6 +48,7 @@ NOTE: no nested resource support. yet. this is in testing
       respond_to do |format|
         format.html
         format.xml  { render :xml => @posts }
+        format.js
       end
     end
 
@@ -57,6 +56,7 @@ NOTE: no nested resource support. yet. this is in testing
       respond_to do |format|
         format.html
         format.xml  { render :xml => @post }
+        format.js
       end
     end
 
@@ -64,6 +64,7 @@ NOTE: no nested resource support. yet. this is in testing
       respond_to do |format|
         format.html { render :action => :edit }
         format.xml  { render :xml => @post }
+        format.js
       end
     end
 
@@ -73,14 +74,20 @@ NOTE: no nested resource support. yet. this is in testing
           flash[:notice] = 'Post was successfully created.'
           format.html { redirect_to @post }
           format.xml  { render :xml => @post, :status => :created, :location => @post }
+          format.js
         else
           format.html { render :action => :new }
           format.xml  { render :xml => @post.errors, :status => :unprocessable_entity }
+          format.js
         end
       end
     end 
 
     def edit
+      respond_to do |format|
+        format.html
+        format.js
+      end
     end
 
     def update
@@ -89,9 +96,11 @@ NOTE: no nested resource support. yet. this is in testing
           flash[:notice] = 'Post was successfully updated.'
           format.html { redirect_to @post }
           format.xml  { head :ok }
+          format.js
         else
           format.html { render :action => :edit }
           format.xml  { render :xml => @post.errors, :status => :unprocessable_entity }
+          format.js
         end
       end
     end
@@ -100,8 +109,31 @@ NOTE: no nested resource support. yet. this is in testing
       respond_to do |format|
         format.html { redirect_to :action => posts_url }
         format.xml  { head :ok }
+        format.js
       end
     end
   end
 
+Nested resources like so:
+
+  class CommentsController < ActionController::Base
+    resource_this :nested => [:posts]
+  end
+
+This generates a very similar controller to the one above with adjusted redirects and one additional before_filter / loader method pair to grab the parent resource. In this case:
+
+  before_filter :load_post
+  
+  def load_post
+    @post = Post.find(params[:post_id])
+  end
+  
+The separation of logic - DB operations in before_filters, rendering in the standard resource controller methods - makes this approach rediculously easy to customize. Need to load an additional object for the :show action? Slap another before_filter on it. Need to change the path that the :update action redirects to? Override the :update action with your new rendering behavior.
+
+Questions? Comments? Flames? Patches?
+===========
+jnewland@gmail.com
+
+Copyright
+===========
 Copyright (c) 2007 Jesse Newland, released under the MIT license
