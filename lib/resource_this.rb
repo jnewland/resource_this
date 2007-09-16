@@ -34,7 +34,7 @@ module ResourceThis # :nodoc:
               format.xml  { render :xml => @#{plural_name} }
             end
           end
-        end
+        end_eval
       end
 
       module_eval <<-"end_eval", __FILE__, __LINE__
