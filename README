@@ -3,6 +3,8 @@ resouce_this
 
 Not scaffolding. Resourcing. Creates extremely customizable resource controllers with one line of code.
 
+NOTE: no nested resource support. yet. this is in testing
+
   class PostsController < ActionController::Base
    resource_this
   end
