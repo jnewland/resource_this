@@ -32,11 +32,11 @@ module ResourceThis # :nodoc:
         
         def create_#{singular_name}
           @#{singular_name} = #{class_name}.new(params[:#{singular_name}])
-          @#{singular_name} = @#{singular_name}.save
+          created = @#{singular_name}.save
         end
         
         def update_#{singular_name}
-          @#{singular_name} = @#{singular_name}.update_attributes(params[:#{singular_name}])
+          updated = @#{singular_name}.update_attributes(params[:#{singular_name}])
         end
         
         def destroy_#{singular_name}
@@ -88,7 +88,7 @@ module ResourceThis # :nodoc:
 
         def create
           respond_to do |format|
-            if @#{singular_name}
+            if created
               flash[:notice] = '#{class_name} was successfully created.'
               format.html { redirect_to @#{singular_name} }
               format.xml  { render :xml => @#{singular_name}, :status => :created, :location => @#{singular_name} }
@@ -104,7 +104,7 @@ module ResourceThis # :nodoc:
 
         def update
           respond_to do |format|
-            if @#{singular_name}
+            if updated
               flash[:notice] = '#{class_name} was successfully updated.'
               format.html { redirect_to @#{singular_name} }
               format.xml  { head :ok }
