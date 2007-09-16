@@ -45,7 +45,7 @@ module ResourceThis # :nodoc:
         end
 
         def create
-          @#{singular_name}" = #{class_name}.create!(params[:#{singular_name}])
+          @#{singular_name} = #{class_name}.create!(params[:#{singular_name}])
           flash[:notice] = "#{class_name} was successfully created."
           respond_to do |format|
             format.html { redirect_to :action => :index }
