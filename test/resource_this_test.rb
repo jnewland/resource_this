@@ -8,6 +8,8 @@ ActiveRecord::Schema.define(:version => 1) do
   create_table :posts do |t|
     t.column :title,      :string
     t.column :body,       :text
+    t.column :slug,       :text
+    t.column :user_id,     :integer
     t.column :created_at, :datetime
     t.column :updated_at, :datetime
   end
@@ -26,7 +28,7 @@ class ResourceThisTest < Test::Unit::TestCase
     @request    = ActionController::TestRequest.new
     @request.accept = 'application/xml'  
     @response   = ActionController::TestResponse.new
-    @first = Post.create :title => "Welcome to the weblog", :body => "Such a lovely day"
+    @first = Post.create :title => "Welcome to the weblog", :body => "Such a lovely day", :slug => "welcome", :user_id => 1
   end
 
   def test_should_get_index
@@ -43,7 +45,7 @@ class ResourceThisTest < Test::Unit::TestCase
 
   def test_should_create_post
     assert_difference('Post.count') do
-      post :create, :post => { :title => "test", :body => "test" }
+      post :create, :post => { :title => "test", :body => "test", :slug => "test", :user_id => 1 }
     end
     assert_response :created
     assert assigns(:post)
@@ -56,7 +58,7 @@ class ResourceThisTest < Test::Unit::TestCase
   end
 
   def test_should_update_post
-    put :update, :id => 1, :post => { :title => "test", :body => "test" }
+    put :update, :id => 1, :post => { :title => "test", :body => "test", :slug => "test", :user_id => 1 }
     assert_response :success
     assert assigns(:post)
   end
