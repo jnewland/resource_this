@@ -128,7 +128,7 @@ This generates a very similar controller to the one above with adjusted redirect
     @post = Post.find(params[:post_id])
   end
   
-The separation of logic - DB operations in before_filters, rendering in the standard resource controller methods - makes this approach rediculously easy to customize. Need to load an additional object for the :show action? Slap another before_filter on it. Need to change the path that the :update action redirects to? Override the :update action with your new rendering behavior.
+The separation of logic - DB operations in before_filters, rendering in the standard resource controller methods - makes this approach ridiculously easy to customize. Need to load an additional object for the :show action? Slap another before_filter on it. Need to change the path that the :update action redirects to? Override the :update action with your new rendering behavior.
 
 A resource_this generator is included - does the same thing as the 'resource' generator but adds 'resource_this' to the generated controller.
 
