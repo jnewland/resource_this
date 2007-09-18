@@ -11,7 +11,7 @@ module ResourceThis # :nodoc:
       singular_name         = options[:class_name].downcase.singularize unless options[:class_name].nil?
       class_name            = options[:class_name] || singular_name.camelize
       plural_name           = singular_name.pluralize
-      will_paginate_index   = options[:class_name] || false
+      will_paginate_index   = options[:will_paginate] || false
       url_string            = "@#{singular_name}"
       list_url_string       = "#{plural_name}_url"
       finder_base           = class_name
