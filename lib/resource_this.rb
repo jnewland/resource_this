@@ -5,14 +5,14 @@ module ResourceThis # :nodoc:
 
   module ClassMethods
     def resource_this(options = {})
-      options.assert_valid_keys(:class_name, :will_paginate, :sort_method, :nested)
+      options.assert_valid_keys(:class_name, :will_paginate, :sort_method, :nested, :path_prefix)
 
       singular_name         = controller_name.singularize
       singular_name         = options[:class_name].downcase.singularize unless options[:class_name].nil?
       class_name            = options[:class_name] || singular_name.camelize
       plural_name           = singular_name.pluralize
       will_paginate_index   = options[:will_paginate] || false
-      url_string            = "@#{singular_name}"
+      url_string            = "#{singular_name}_url(@#{singular_name})"
       list_url_string       = "#{plural_name}_url"
       finder_base           = class_name
       
@@ -26,6 +26,10 @@ module ResourceThis # :nodoc:
           before_filter :load_#{nested}
         end_eval
       end
+      
+      #process path_prefix
+      url_string            = options[:path_prefix] + url_string unless options[:path_prefix].nil?
+      list_url_string       = options[:path_prefix] + list_url_string unless options[:path_prefix].nil?
       
       #standard before_filters
       module_eval <<-"end_eval", __FILE__, __LINE__

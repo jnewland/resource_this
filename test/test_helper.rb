@@ -36,6 +36,12 @@ class PostsController < ActionController::Base
   resource_this
 end
 
+module Admin; end
+
+class Admin::PostsController < ActionController::Base
+  resource_this :path_prefix => "admin_"
+end
+
 class CommentsController < ActionController::Base
   resource_this :nested => [:posts]
 end
