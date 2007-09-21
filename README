@@ -27,12 +27,16 @@ Not scaffolding. Resourcing. Creates extremely customizable resource controllers
     end
   
     def create_post
-      @post = Post.new(params[:post])
-      @created = @post.save
+      returning true do
+        @post = Post.new(params[:post])
+        @created = @post.save
+      end
     end
   
     def update_post
-      @updated = @post.update_attributes(params[:post])
+      returning true do
+        @updated = @post.update_attributes(params[:post])
+      end
     end
   
     def destroy_post
