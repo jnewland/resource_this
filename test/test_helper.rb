@@ -21,6 +21,7 @@ end
 
 class Post < ActiveRecord::Base
   has_many :comments
+  validates_length_of :title, :within => 2..100
   def validate
   end
 end

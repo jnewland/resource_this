@@ -38,6 +38,16 @@ class ResourceThisTest < Test::Unit::TestCase
     assert assigns(:post)
   end
   
+  def test_should_handle_invalid_post_on_create
+    assert_no_difference('Post.count') do
+      post :create, :post => { :title => "1" }
+    end
+    assert_response :unprocessable_entity
+    assert assigns(:post).errors
+    assert !assigns(:created)
+  end
+  
+  
   def test_should_create_post_html
     @request.accept = 'text/html'
     assert_difference('Post.count') do
@@ -56,6 +66,13 @@ class ResourceThisTest < Test::Unit::TestCase
     put :update, :id => @first.id, :post => { :title => "test", :body => "test" }
     assert_response :success
     assert assigns(:post)
+  end
+  
+  def test_should_handle_invalid_post_on_update
+    post :update, :id => @first.id, :post => { :title => "1" }
+    assert_response :unprocessable_entity
+    assert assigns(:post).errors
+    assert !assigns(:updated)
   end
   
   def test_should_update_post_html
