@@ -126,7 +126,7 @@ module ResourceThis # :nodoc:
               format.xml  { render :xml => @#{singular_name}, :status => :created, :location => #{url_string} }
               format.js
             else
-              format.html { render :action => :new }
+              format.html { render :action => :edit }
               format.xml  { render :xml => @#{singular_name}.errors, :status => :unprocessable_entity }
               format.js
             end
