@@ -1,6 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '../../../../config/environment.rb'))
 require 'action_controller/test_process'
-require 'active_record/fixtures'
+require 'test/unit'
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :dbfile => ":memory:")
 
@@ -14,6 +14,12 @@ ActiveRecord::Schema.define(:version => 1) do
   create_table :comments do |t|
     t.column :body,         :text
     t.column :post_id,      :integer
+    t.column :created_at,   :datetime
+    t.column :updated_at,   :datetime
+  end
+  create_table :widgets do |t|
+    t.column :title,        :string
+    t.column :body,         :text
     t.column :created_at,   :datetime
     t.column :updated_at,   :datetime
   end
@@ -33,7 +39,16 @@ class Comment < ActiveRecord::Base
   validates_associated :post
 end
 
+class Widget < ActiveRecord::Base
+  def validate
+  end
+end
+
 class PostsController < ActionController::Base
+  resource_this
+end
+
+class WidgetsController < ActionController::Base
   resource_this
 end
 

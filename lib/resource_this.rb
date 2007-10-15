@@ -5,7 +5,7 @@ module ResourceThis # :nodoc:
 
   module ClassMethods
     def resource_this(options = {})
-      options.assert_valid_keys(:class_name, :will_paginate, :sort_method, :nested, :path_prefix)
+      options.assert_valid_keys(:class_name, :will_paginate, :finder_options, :nested, :path_prefix)
 
       singular_name         = controller_name.singularize
       singular_name         = options[:class_name].downcase.singularize unless options[:class_name].nil?
@@ -15,6 +15,9 @@ module ResourceThis # :nodoc:
       url_string            = "#{singular_name}_url(@#{singular_name})"
       list_url_string       = "#{plural_name}_url"
       finder_base           = class_name
+      
+      class_inheritable_accessor :resource_this_finder_options
+      self.resource_this_finder_options = options[:finder_options] || {}
       
       unless options[:nested].nil?
         nested              = options[:nested].to_s.singularize
@@ -81,13 +84,15 @@ module ResourceThis # :nodoc:
       if will_paginate_index
         module_eval <<-"end_eval", __FILE__, __LINE__
           def load_#{plural_name}
-            @#{plural_name} = #{finder_base}.paginate(:page => params[:page])
+            finder_options = resource_this_finder_options.class == Proc ? resource_this_finder_options.call : resource_this_finder_options
+            @#{plural_name} = #{finder_base}.paginate(finder_options.merge(:page => params[:page]))
           end
         end_eval
       else
         module_eval <<-"end_eval", __FILE__, __LINE__
           def load_#{plural_name}
-            @#{plural_name} = #{finder_base}.find(:all)
+            finder_options = resource_this_finder_options.class == Proc ? resource_this_finder_options.call : resource_this_finder_options
+            @#{plural_name} = #{finder_base}.find(:all, finder_options)
           end
         end_eval
       end

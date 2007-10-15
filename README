@@ -118,7 +118,8 @@ Not scaffolding. Resourcing. Creates extremely customizable resource controllers
     end
   end
 
-Nested resources like so:
+Nested Resources
+===========
 
   class CommentsController < ActionController::Base
     resource_this :nested => [:posts]
@@ -132,7 +133,48 @@ This generates a very similar controller to the one above with adjusted redirect
     @post = Post.find(params[:post_id])
   end
   
+Sorting, etc
+===========
+
+  class CommentsController < ActionController::Base
+    resource_this :finder_options => {:order => 'created_on'}
+  end
+  
+...or, for lazily evaluated sorting options:
+
+  class CommentsController < ActionController::Base
+    resource_this :finder_options => Proc.new { finder_options }
+    
+  protected
+  
+    def finder_options
+      order = case params[:sort]
+        when 'date_reverse'          then 'created_on desc'
+        else 'created_on'
+      end
+      {:order => order, :limit => params[:limit] || 10 }
+    end
+    
+  end
+
+will_paginate
+===========
+
+will_paginate support is baked right in:
+
+  class CommentsController < ActionController::Base
+    resource_this :will_paginate => true
+  end
+  
+This works with the :finder_options option as well
+  
+Opinionated Software
+===========
+  
 The separation of logic - DB operations in before_filters, rendering in the standard resource controller methods - makes this approach ridiculously easy to customize. Need to load an additional object for the :show action? Slap another before_filter on it. Need to change the path that the :update action redirects to? Override the :update action with your new rendering behavior.
+
+Generator
+===========
 
 A resource_this generator is included - does the same thing as the 'resource' generator but adds 'resource_this' to the generated controller.
 
