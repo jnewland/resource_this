@@ -11,10 +11,8 @@ class ResourceThisSortingTest < Test::Unit::TestCase
     100.times do
       Widget.create(:title => "foo", :body => "bar")
     end
-    with_routing do |set|
-      set.draw do |map| 
-        map.resources :widgets
-      end
+    ActionController::Routing::Routes.draw do |map| 
+      map.resources :widgets
     end
   end
   

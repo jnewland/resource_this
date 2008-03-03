@@ -7,10 +7,8 @@ class ResourceThisTest < Test::Unit::TestCase
     @request.accept = 'application/xml'  
     @response   = ActionController::TestResponse.new
     @first = Post.create(:title => "test", :body => "test")
-    with_routing do |set|
-      set.draw do |map| 
-        map.resources :posts
-      end
+    ActionController::Routing::Routes.draw do |map| 
+      map.resources :posts
     end
   end
   

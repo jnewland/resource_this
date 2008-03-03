@@ -6,12 +6,10 @@ class ResourceThisUrlPrefixTest < Test::Unit::TestCase
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
     @first = Post.create(:title => "test", :body => "test")
-    with_routing do |set|
-      set.draw do |map| 
-        map.resources :posts
-        map.with_options :path_prefix => 'admin', :name_prefix => 'admin_' do |map|
-          map.resources   :posts,     :controller => 'admin/posts'
-        end
+    ActionController::Routing::Routes.draw do |map| 
+      map.resources :posts
+      map.with_options :path_prefix => 'admin', :name_prefix => 'admin_' do |map|
+        map.resources   :posts,     :controller => 'admin/posts'
       end
     end
   end

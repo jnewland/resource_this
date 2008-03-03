@@ -8,11 +8,9 @@ class ResourceThisNestingTest < Test::Unit::TestCase
     @response   = ActionController::TestResponse.new
     @first = Post.create(:title => "test", :body => "test")
     @first_comment = Comment.create(:post => @first, :body => "test")
-    with_routing do |set|
-      set.draw do |map| 
-        map.resources :posts do |post|
-          post.resources :comments
-        end
+    ActionController::Routing::Routes.draw do |map|  
+      map.resources :posts do |post|
+        post.resources :comments
       end
     end
   end

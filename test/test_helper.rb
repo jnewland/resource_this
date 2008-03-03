@@ -1,6 +1,23 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../../../../config/environment.rb'))
+$LOAD_PATH.unshift 'lib/'
+
+require 'rubygems'
+require 'multi_rails_init'
 require 'action_controller/test_process'
 require 'test/unit'
+require 'resource_this'
+
+begin
+  require 'redgreen'
+rescue LoadError
+  nil
+end
+
+RAILS_ROOT = '.'    unless defined? RAILS_ROOT
+RAILS_ENV  = 'test' unless defined? RAILS_ENV
+
+
+
+ActionController::Base.send :include, ResourceThis
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :dbfile => ":memory:")
 
