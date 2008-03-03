@@ -15,7 +15,8 @@ end
 RAILS_ROOT = '.'    unless defined? RAILS_ROOT
 RAILS_ENV  = 'test' unless defined? RAILS_ENV
 
-
+ActiveRecord::Base.logger = Logger.new(STDOUT) if ENV['DEBUG']
+ActionController::Base.logger = Logger.new(STDOUT) if ENV['DEBUG']
 
 ActionController::Base.send :include, ResourceThis
 

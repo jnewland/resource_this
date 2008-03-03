@@ -12,28 +12,26 @@ module ResourceThis # :nodoc:
       class_name            = options[:class_name] || singular_name.camelize
       plural_name           = singular_name.pluralize
       will_paginate_index   = options[:will_paginate] || false
-      url_string            = "#{singular_name}_url(@#{singular_name})"
-      list_url_string       = "#{plural_name}_url"
-      finder_base           = class_name
+      resource_url          = "#{singular_name}_url(@#{singular_name})"
+      collection_url        = "#{plural_name}_url"
+      resource_url          = options[:path_prefix] + resource_url unless options[:path_prefix].nil?
+      collection_url        = options[:path_prefix] + collection_url unless options[:path_prefix].nil?
       
       class_inheritable_accessor :resource_this_finder_options
       self.resource_this_finder_options = options[:finder_options] || {}
       
       unless options[:nested].nil?
-        nested              = options[:nested].to_s.singularize
-        nested_class        = nested.camelize
-        url_string          = "#{nested}_#{singular_name}_url(" + [nested, singular_name].map { |route| "@#{route}"}.join(', ') + ')'
-        list_url_string     = "#{nested}_#{plural_name}_url(@#{nested})"
-        finder_base         = "@#{nested}.#{plural_name}"
+        nested                = options[:nested].to_s.singularize
+        nested_class          = nested.camelize
+        nested_resource_url   = "#{nested}_#{singular_name}_url(" + [nested, singular_name].map { |route| "@#{route}"}.join(', ') + ')'
+        nested_collection_url = "#{nested}_#{plural_name}_url(@#{nested})"
+        nested_resource_url   = options[:path_prefix] + nested_resource_url unless options[:path_prefix].nil?
+        nested_collection_url = options[:path_prefix] + nested_collection_url unless options[:path_prefix].nil?
         module_eval <<-"end_eval", __FILE__, __LINE__
           before_filter :load_#{nested}
         end_eval
       end
-      
-      #process path_prefix
-      url_string            = options[:path_prefix] + url_string unless options[:path_prefix].nil?
-      list_url_string       = options[:path_prefix] + list_url_string unless options[:path_prefix].nil?
-      
+
       #standard before_filters
       module_eval <<-"end_eval", __FILE__, __LINE__
         before_filter :load_#{singular_name}, :only => [ :show, :edit, :update, :destroy ]
@@ -42,29 +40,69 @@ module ResourceThis # :nodoc:
         before_filter :create_#{singular_name}, :only => [ :create ]
         before_filter :update_#{singular_name}, :only => [ :update ]
         before_filter :destroy_#{singular_name}, :only => [ :destroy ]
+      
       protected
+      
+        def finder_options
+          resource_this_finder_options.class == Proc ? resource_this_finder_options.call : {}
+        end
+      
       end_eval
       
-      unless options[:nested].nil?
+      if options[:nested].nil?
+        module_eval <<-"end_eval", __FILE__, __LINE__
+          def finder_base
+            #{class_name}
+          end
+          
+          def collection
+            #{class_name}.find(:all, finder_options)
+          end
+          
+          def collection_url
+            #{collection_url}
+          end
+
+          def resource_url
+            #{resource_url}
+          end
+        end_eval
+      else
         module_eval <<-"end_eval", __FILE__, __LINE__
           def load_#{nested}
-            @#{nested} = #{nested_class}.find(params[:#{nested}_id])
+            @#{nested} = #{nested_class}.find(params[:#{nested}_id]) rescue nil
+          end
+          
+          def finder_base
+            @#{nested}.nil? ? #{class_name} : @#{nested}.#{plural_name}
+          end
+          
+          def collection
+            @#{nested}.nil? ? #{class_name}.find(:all, finder_options) : @#{nested}.#{plural_name}.find(:all, finder_options)
+          end
+          
+          def collection_url
+            @#{nested}.nil? ? #{collection_url} : #{nested_collection_url}
+          end
+
+          def resource_url
+            @#{nested}.nil? ? #{resource_url} : #{nested_resource_url}
           end
         end_eval
       end
       
       module_eval <<-"end_eval", __FILE__, __LINE__
         def load_#{singular_name}
-          @#{singular_name} = #{finder_base}.find(params[:id])
+          @#{singular_name} = finder_base.find(params[:id])
         end
         
         def new_#{singular_name}
-          @#{singular_name} = #{finder_base}.new
+          @#{singular_name} = finder_base.new
         end
         
         def create_#{singular_name}
           returning true do
-            @#{singular_name} = #{finder_base}.new(params[:#{singular_name}])
+            @#{singular_name} = finder_base.new(params[:#{singular_name}])
             @created = @#{singular_name}.save
           end
         end
@@ -80,19 +118,16 @@ module ResourceThis # :nodoc:
         end
       end_eval
             
-      #TODO: add sorting customizable by subclassed controllers      
       if will_paginate_index
         module_eval <<-"end_eval", __FILE__, __LINE__
           def load_#{plural_name}
-            finder_options = resource_this_finder_options.class == Proc ? resource_this_finder_options.call : resource_this_finder_options
-            @#{plural_name} = #{finder_base}.paginate(finder_options.merge(:page => params[:page]))
+            @#{plural_name} = finder_base.paginate(finder_options.merge(:page => params[:page]))
           end
         end_eval
       else
         module_eval <<-"end_eval", __FILE__, __LINE__
           def load_#{plural_name}
-            finder_options = resource_this_finder_options.class == Proc ? resource_this_finder_options.call : resource_this_finder_options
-            @#{plural_name} = #{finder_base}.find(:all, finder_options)
+            @#{plural_name} = collection
           end
         end_eval
       end
@@ -127,8 +162,8 @@ module ResourceThis # :nodoc:
           respond_to do |format|
             if @created
               flash[:notice] = '#{class_name} was successfully created.'
-              format.html { redirect_to #{url_string} }
-              format.xml  { render :xml => @#{singular_name}, :status => :created, :location => #{url_string} }
+              format.html { redirect_to(resource_url) }
+              format.xml  { render :xml => @#{singular_name}, :status => :created, :location => resource_url }
               format.js
             else
               format.html { render :action => :edit }
@@ -149,7 +184,7 @@ module ResourceThis # :nodoc:
           respond_to do |format|
             if @updated
               flash[:notice] = '#{class_name} was successfully updated.'
-              format.html { redirect_to #{url_string} }
+              format.html { redirect_to(resource_url) }
               format.xml  { head :ok }
               format.js
             else
@@ -162,7 +197,7 @@ module ResourceThis # :nodoc:
 
         def destroy          
           respond_to do |format|
-            format.html { redirect_to #{list_url_string} }
+            format.html { redirect_to(collection_url) }
             format.xml  { head :ok }
             format.js
           end

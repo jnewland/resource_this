@@ -27,8 +27,8 @@ class ResourceThisSortingTest < Test::Unit::TestCase
     assert_equal @a, assigns(:widgets).first
   end
   
-  def test_should_get_index_sorted
-    @controller.resource_this_finder_options = {:order => 'body'}
+  def test_should_get_index_sorted_with_inline_proc
+    @controller.resource_this_finder_options = Proc.new { { :order => 'body' } }
     get :index
     assert_response :success
     assert assigns(:widgets)
