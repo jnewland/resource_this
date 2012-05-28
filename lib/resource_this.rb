@@ -21,7 +21,7 @@ module ResourceThis # :nodoc:
       self.resource_this_finder_options = options[:finder_options] || {}
       
       unless options[:nested].nil?
-        nested                = options[:nested].to_s.singularize
+        nested                = [options[:nested]].flatten[0].to_s.singularize
         nested_class          = nested.camelize
         nested_resource_url   = "#{nested}_#{singular_name}_url(" + [nested, singular_name].map { |route| "@#{route}"}.join(', ') + ')'
         nested_collection_url = "#{nested}_#{plural_name}_url(@#{nested})"
